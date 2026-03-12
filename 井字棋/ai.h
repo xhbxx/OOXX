@@ -1,28 +1,24 @@
 #pragma once
 #include "board.h"
 
-class AI
+class ai
 {
-private:
-	int aiColor; // AI的颜色 (1为X, 2为O)
-
 public:
-	// 构造函数
-	AI(int color);
-
-	// 获取AI的最佳走法
-	int getBestMove();
-
+	ai(int color);
+	void reset();
+	int move();
+	int convertBoard(int Board[9]);
+	//价值数组
+	vector<double> value[19683];
+	int aiColor;
 private:
-	// Minimax算法
-	int minimax(int depth, bool isMaximizing);
-
-	// 评估函数
-	int evaluate();
-
-	// 检查是否获胜
-	bool checkWin(int color);
-
-	// 检查是否平局
-	bool checkDraw();
+	int minmax(int Color, int depth);
+	int revertBoard(int index);	
+	int random(int n);
+	//随机率
+	int Epsilon;
+	//学习率
+	int alpha;
+	//记录自己走后的局面
+	int stored_OutCome;
 };
