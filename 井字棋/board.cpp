@@ -66,8 +66,9 @@ int checkWin()
 	for (int i = 0; i < 8; i++)
 	{
 		if (board[win[i][0]] != 0 && board[win[i][0]] == board[win[i][1]] && board[win[i][1]] == board[win[i][2]])
-		{
-			return 1;
+		{		
+				return 1;
+		
 		}
 	}
 	return -1;

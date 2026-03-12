@@ -3,6 +3,8 @@
 #include<string>
 #include<algorithm>
 #include<random>
+#include<fstream>
+#include<vector>
 using namespace std;
 
 extern int board[9];

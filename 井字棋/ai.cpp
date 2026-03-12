@@ -1,11 +1,15 @@
 #include"ai.h"
-#include"board.h"
+
 
 
 ai::ai(int Color)
-{
-	aiColor = Color;
-};
+	:aiColor(Color)
+	,value(19683,0.5)
+	,Epsilon(0.1)
+	,alpha(0.1)
+	,stored_OutCome(0)
+{}
+
 int ai::minmax(int Color,int depth)
 	{
 		int alpha = INT_MIN;
@@ -27,18 +31,18 @@ int ai::minmax(int Color,int depth)
 				}
 				if (Color == aiColor)
 				{
-					val = max(val, minmax(3 - color,depth-1));
+					val = max(val, minmax(3 - Color,depth-1));
 				}
 				else
 				{
-					val = min(val, minmax(3 - color, depth - 1));
+					val = min(val, minmax(3 - Color, depth - 1));
 				}			
 		}
 	}
 //重置存储的棋盘
 void ai::reset()
 {
-	stored_OutCome = 0;
+	this->stored_OutCome = 0;
 }
 //生成0到n的随机数
 int ai::random(int n)
@@ -82,21 +86,21 @@ int ai::move()
 	int bestPoint = 0;
 	//记录tempValue最大值用于更新bestPoint
 	double temp = 0.0;
-	if (random(9) < Epsilon)
+	if (random(9)/10.0 < this->Epsilon)
 	{	
 		//随机的下棋点
 		bestPoint = random(n);
-		board[bestPoint] = aiColor;
+		board[bestPoint] = this->aiColor;
 	}
 	else
 	{	//临时记录下一步每个棋局的价值
-		vector<double> tempValue[9];
+		vector<double> tempValue(9,0);
 		//假想下棋，记录棋局分数
 		for (int point : availble)
 		{
-			board[point] = aiColor;
+			board[point] = this->aiColor;
 			index = convertBoard(board);
-			tempValue[point] = value[index];
+			tempValue[point] = this->value[index];
 			board[point] = 0;
 		}
 		//找出价值最高的下棋点
@@ -111,8 +115,19 @@ int ai::move()
 		board[bestPoint] = aiColor;
 	}
 	//时序差分
-	int error = temp - value[stored_OutCome];
-	value[stored_OutCome] += error * Epsilon;
-	stored_OutCome = convertBoard(board);
+	double error = temp - this->value[this->stored_OutCome];
+	this->value[this->stored_OutCome] += error * this->alpha;
+	this->stored_OutCome = convertBoard(board);
 	return bestPoint;
+}
+void saveValueTable(const std::vector<double>& table, const std::string& filename) {
+	// std::ios::binary 告诉 C++：直接传数据，不要做任何字符转换
+	std::ofstream outFile(filename, std::ios::out | std::ios::binary);
+
+	if (outFile.is_open()) {
+		// 参数 1：数据的首地址（转成 char 指针）
+		// 参数 2：总长度（元素个数 * 每个 double 的大小）
+		outFile.write(reinterpret_cast<const char*>(table.data()), table.size() * sizeof(double));
+		outFile.close();
+	}
 }
