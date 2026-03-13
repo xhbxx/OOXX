@@ -4,19 +4,16 @@
 // 全局棋盘数组
 int board[9] = {0};
 
+// 是否启用图形绘制（false=无头训练模式，速度快）
+const bool ENABLE_GRAPHICS = false;
+
 int main()
 {	
-	// 初始化图形窗口（550x550像素）
-	initgraph(550, 550);
-	
-	// 储存下棋之前的棋盘状态（用于TD学习）
-	int state[9] = { 0 };	
-	
-	// 标记游戏是否结束
-	bool isWin = false;
-	
-	// 记录当前下棋位置
-	int pos = 0;
+	// 仅在启用图形时初始化窗口
+	if (ENABLE_GRAPHICS)
+	{
+		initgraph(550, 550);
+	}
 	
 	// 统计两个AI的胜场数
 	int one = 0;   // AI1胜场
@@ -32,35 +29,38 @@ int main()
 	loadValueTable(agent1.value, "value.bin");
 	
 	// 设置探索率
-	// agent1：初始探索率0.3（较多探索）
-	// agent2：初始探索率1.0（完全随机）
-	agent1.Epsilon = 0.3;
-	agent2.Epsilon = 1;
+	// agent1：初始探索率0.5（50%概率随机探索）
+	// agent2：初始探索率1.0（完全随机，不学习）
+	agent1.Epsilon = 0.5;
+	agent2.Epsilon = 1.0;
 	
 	// 记录当前玩家和下一个玩家
 	ai* curPlayer = &agent1;
 	ai* nextPlayer = &agent2;
 	
 	// 用于交换玩家的临时指针
-	ai* temp = &agent1;
+	ai* temp = nullptr;
 	
 	// 训练参数
-	const int TOTAL_GAMES = 1000000;  // 总训练局数
-	const int PRINT_INTERVAL = 50000; // 每50000局打印一次统计信息
+	const int TOTAL_GAMES = 50000000;  // 总训练局数（5000万）
+	const int PRINT_INTERVAL = 500000; // 每50万局打印一次统计信息
 	
 	// 主训练循环
 	for (int i = 0; i < TOTAL_GAMES; i++)
 	{	
 		// 初始化新的一局游戏
 		initBoard();
-		drawBoard();		
 		
-		// 重置本局的统计变量
-		int winner1 = 0;
-		int winner2 = 0;
-		int draw = 0;
-		isWin = false;
-		memset(state, 0, sizeof(state));
+		if (ENABLE_GRAPHICS)
+		{
+			drawBoard();
+		}
+		
+		// 标记游戏是否结束
+		bool isWin = false;
+		
+		// 储存下棋之前的棋盘状态（用于TD学习）
+		int state[9] = { 0 };
 		
 		// 重置两个AI的状态
 		agent1.reset();
@@ -75,8 +75,11 @@ int main()
 			// 当前玩家执行下棋动作
 			int pos = curPlayer->move();
 			
-			// 在图形窗口绘制棋子
-			drawPiece(pos, curPlayer->aiColor);
+			// 在图形窗口绘制棋子（仅在启用图形时）
+			if (ENABLE_GRAPHICS)
+			{
+				drawPiece(pos, curPlayer->aiColor);
+			}
 			
 			// 检查游戏是否结束
 			// 返回值：1=有人赢，0=平局，-1=游戏继续
@@ -123,17 +126,22 @@ int main()
 		// 定期打印训练进度和统计信息
 		if ((i + 1) % PRINT_INTERVAL == 0)
 		{
-			cout << "第 " << (i + 1) << " 局 | ";
-			cout << "AI1胜利: " << one << " | ";
-			cout << "AI2胜利: " << two << " | ";
-			cout << "平局: " << neither << " | ";
-			cout << "AI1胜率: " << (double)one / (i + 1) * 100 << "%" << endl;
+			int games_played = i + 1;
+			double ai1_win_rate = (double)one / games_played * 100;
+			double ai2_win_rate = (double)two / games_played * 100;
+			double draw_rate = (double)neither / games_played * 100;
 			
-			// 在100000局时降低探索率，进入利用阶段
-			if (i + 1 == 100000)
+			cout << "第 " << games_played << " 局 | ";
+			cout << "AI1胜: " << one << " (" << ai1_win_rate << "%) | ";
+			cout << "AI2胜: " << two << " (" << ai2_win_rate << "%) | ";
+			cout << "平局: " << neither << " (" << draw_rate << "%) | ";
+			cout << "Epsilon: " << agent1.Epsilon << endl;
+			
+			// 平滑的Epsilon衰减策略
+			// 从0.5逐渐衰减到0.05，使用指数衰减
+			if (agent1.Epsilon > 0.05)
 			{
-				agent1.Epsilon = 0.1;  // 降低AI1的探索率
-				cout << ">>> 已完成100000局，降低AI1探索率至0.1" << endl;
+				agent1.Epsilon *= 0.9999;  // 每局衰减0.01%
 			}
 		}
 	}
@@ -149,6 +157,11 @@ int main()
 	// 保存训练后的价值表到文件
 	saveValueTable(agent1.value, "value.bin");
 	cout << "价值表已保存到 value.bin" << endl;
+	
+	if (ENABLE_GRAPHICS)
+	{
+		closeBoard();
+	}
 	
 	system("pause");
 	return 0;

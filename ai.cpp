@@ -6,19 +6,24 @@ std::mt19937 ai::rng(std::random_device{}());
 ai::ai(int Color)
 	:aiColor(Color)
 	// 价值表大小为3^9=19683（每个格子3种状态：空/己方/对方）
+	// 初始值为0.5表示中立态度（既不好也不坏）
 	,value(19683, 0.5)
-	// 初始探索率为0.1（10%概率随机探索）
-	,Epsilon(0.1)
+	// 初始探索率为0.5（50%概率随机探索）
+	,Epsilon(0.5)
 	// 学习率为0.1（控制TD更新的步长）
 	,alpha(0.1)
 	// 初始化为0（第一步没有前驱状态）
 	,stored_OutCome(0)
+	// 游戏结果奖励初始化
+	,final_reward(0)
 {}
 
 // 重置储存的结果（每局游戏开始时调用）
 void ai::reset()
 {
 	this->stored_OutCome = 0;
+	this->episode_states.clear();
+	this->final_reward = 0;
 }
 
 // 生成0到n之间的随机整数（优化版：使用静态RNG）
@@ -70,7 +75,7 @@ int ai::move()
 	double temp = 0.0;
 	
 	// ε-贪心策略：以Epsilon概率随机探索，否则选择价值最高的位置
-	if (random(9) / 10.0 < this->Epsilon)
+	if (random(100) / 100.0 < this->Epsilon)
 	{	
 		// 随机选择一个可用位置（探索）
 		bestPoint = random(n - 1);
@@ -110,11 +115,16 @@ int ai::move()
 	
 	// 时序差分(TD)学习：更新前一步的价值估计
 	// 公式：V(s) = V(s) + α * [V(s') - V(s)]
-	double error = temp - this->value[this->stored_OutCome];
-	this->value[this->stored_OutCome] += error * this->alpha;
+	if (this->stored_OutCome != 0)
+	{
+		double error = temp - this->value[this->stored_OutCome];
+		this->value[this->stored_OutCome] += error * this->alpha;
+	}
 	
 	// 保存当前状态作为下一步的前驱状态
 	this->stored_OutCome = convertBoard(board);
+	// 记录本局的所有状态，用于游戏结束时的批量更新
+	this->episode_states.push_back(this->stored_OutCome);
 	
 	return bestPoint;
 }
@@ -132,6 +142,10 @@ void saveValueTable(const std::vector<double>& table, const std::string& filenam
 		outFile.write(reinterpret_cast<const char*>(table.data()), table.size() * sizeof(double));
 		outFile.close();
 	}
+	else
+	{
+		cerr << "Error: Failed to save value table to " << filename << endl;
+	}
 }
 
 // 从二进制文件加载价值表
@@ -145,5 +159,9 @@ void loadValueTable(std::vector<double>& table, const std::string& filename)
 		// 从二进制文件读取数据到vector
 		inFile.read(reinterpret_cast<char*>(table.data()), table.size() * sizeof(double));
 		inFile.close();
+	}
+	else
+	{
+		cerr << "Warning: Could not load value table from " << filename << endl;
 	}
 }
