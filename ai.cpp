@@ -8,7 +8,7 @@ ai::ai(int Color)
 	,Epsilon(0.1)
 	,alpha(0.1)
 	,stored_OutCome(0)
-{}
+{} 
 
 int ai::minmax(int Color,int depth)
 	{
@@ -44,7 +44,7 @@ int ai::minmax(int Color,int depth)
 
 void ai::reset()
 {
-	this->stored_OutCome = 0;
+	this->stored_OutCome = convertBoard(board);
 }
 //生成0到n的随机数
 
@@ -98,6 +98,7 @@ int ai::move()
 		//随机的下棋点 
 		bestPoint = random(n-1);
 		board[availble[bestPoint]] = this->aiColor;
+		temp = value[convertBoard(board)];
 	}
 	else 
 	{	//临时记录下一步每个棋局的价值 

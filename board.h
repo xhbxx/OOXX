@@ -14,7 +14,7 @@ extern int playerColor;
 void initBoard();
 void drawBoard();
 void drawPiece(int pos, int Color);
+int playerMove();
 void closeBoard();
-//找哪里可以下棋
 vector<int> getAvailble();
 int checkWin();

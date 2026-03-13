@@ -19,7 +19,7 @@ int main()
 	ai agent2(2);
 	//读取记录的价值表
 	loadValueTable(agent1.value, "value.bin");
-	agent1.Epsilon = 0.3;
+	agent1.Epsilon = 0.5;
 	agent2.Epsilon = 1;
 	//记录谁在下棋		
 	ai* curPlayer=&agent1;
@@ -27,11 +27,13 @@ int main()
 	//change
 	ai* temp = &agent1;
 	int n = 500;
-	for (int i = 0; i < 1000000; i++)
+	for (int i = 0; i < 30000; i++)
 	{	
 		initBoard();
-		drawBoard();		
-		int winner1 = 0;
+		drawBoard();	
+		agent1.reset();
+		agent2.reset();
+		int winner1 = 0;                         
 		int winner2 = 0;
 		int draw = 0;
 		isWin = false;
@@ -65,25 +67,24 @@ int main()
 			nextPlayer = temp;
 		}
 		
-		/*if (i == n)
+		if (i == n)
 		{
 			cout << i << " ";
 			cout << "agent1胜利:" << one << endl;
 			cout << "agent2胜利：" << two << endl;
 			cout << "平局" << neither << endl;
-			n += 50000;
-			system("pause");
+			n += 1000;
+		
 		}
-		if (i == 100000)
+		if (i == 20000)
 		{
 			cout << i << " ";
 			cout << "agent1胜利:" << one << endl;
 			cout << "agent2胜利：" << two << endl;
 			cout << "平局" << neither << endl;
 			agent1.Epsilon = 0;
-
-			n += 15000;
-		}*/
+		}
+		
 
 	}
 	cout << "agent1胜利:" << one << endl;
@@ -93,3 +94,28 @@ int main()
 	system("pause");
 	return 0;
 }
+
+//int main()
+//{
+//	initgraph(550, 550);
+//	initBoard();
+//	drawBoard();
+//	ai agent(2);
+//	agent.Epsilon = 0;
+//	int a= 0;
+//	bool isWin = false;
+//	int win = 0;
+//	loadValueTable(agent.value, "value.bin");
+//	while (!isWin) {
+//		a = playerMove();
+//		drawPiece(a, 1);
+//		board[a] = 1;
+//		win = checkWin();
+//		if (win == 1 || win == 2) isWin = true;
+//		a = agent.move();
+//		win = checkWin();
+//		if (win == 1 || win == 2) isWin = true;
+//		drawPiece(a, 2);
+//	}
+//	system("pause");
+//}
