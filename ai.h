@@ -18,6 +18,7 @@ public:
 	void reset();
 	int move();
 	int minmax(int Color, int depth);
+	int evaluate();
 	//转化棋盘 
 	int convertBoard(int Board[9]);
 	void revertBoard(int index,int board[9]);

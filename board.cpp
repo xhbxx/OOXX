@@ -5,13 +5,13 @@ int playerColor = 1;
  
 void initBoard()
 {
-	// �����������
+	// 初始化棋盘
 	for (int i = 0; i < 9; i++)
 	{
 		board[i] = 0;
 	}	
 
-	setbkcolor(WHITE); // ����Ϊ��ɫ
+	setbkcolor(WHITE); // 背景为白色
 	cleardevice();
 }
 

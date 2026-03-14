@@ -77,9 +77,37 @@ int ai::evaluate()
 	const int win[8][3] = {
 		   {0,1,2},{3,4,5},{6,7,8},{0,3,6},{1,4,7},{2,5,8},{0,4,8},{2,4,6}
 	};
+	int val = 0;
 	for (int i = 0; i < 8; i++)
 	{	
-		if (board[win[i][0]] == board[win[i][0]]);
+		if (board[win[i][0]] != 0 && board[win[i][0]] == board[win[i][1]] && board[win[i][1]] == board[win[i][2]])
+		{
+			if (board[win[i][1]] == this->aiColor)
+			{
+				val += 100;
+			}
+			else
+			{
+				val -= 100;
+			}
+		};
+		if (board[win[i][0]] == board[win[i][1]] || board[win[i][0]] == board[win[i][2]])
+		{
+			if (board[win[i][0]] == this->aiColor)
+			{
+				val += 10;
+			}
+			else { val -= 10; }
+		}
+		if (board[win[i][1]] == board[win[i][2]])
+		{
+			if (board[win[i][1]] == this->aiColor)
+			{
+				val += 10;
+			}
+			else { val -= 10; }
+		}
+		return val;
 		
 	}
 }
@@ -132,25 +160,26 @@ int ai::move()
 	int bestPoint = 0;
 	//记录tempValue最大值用于更新bestPoint 
 	double temp = 0.0;
+	//临时记录下一步每个棋局的价值 
+	vector<double> tempValue(9, 0);
+	
 	if (random(9)/10.0 < this->Epsilon)
 	{	
 		//随机的下棋点 
 		bestPoint = random(n-1);
 		board[availble[bestPoint]] = this->aiColor;
+		temp = this->value[convertBoard(board)];
 		bestPoint = availble[bestPoint];
-		temp = value[convertBoard(board)];
 	}
 	else 
-	{	//临时记录下一步每个棋局的价值 
-		vector<double> tempValue(9,0);
-		//假想下棋，记录棋局分数
+	{	//假想下棋，记录棋局分数
 		for (int point : availble)
 		{
 			board[point] = this->aiColor;
 			index = convertBoard(board);
 			tempValue[point] = this->value[index];
 			board[point] = 0;
- 		}
+		}
 		//找出价值最高的下棋点
 		for (int point : availble)
 		{
