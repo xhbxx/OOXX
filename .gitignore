@@ -1,0 +1,42 @@
+# =============== Visual Studio ===============
+# 工作区缓存与用户配置
+.vs/
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# 智能感知数据库
+*.sdf
+*.opensdf
+*.dbmdl
+
+# =============== 编译输出 ===============
+[Dd]ebug/
+[Rr]elease/
+x64/
+x86/
+bld/
+[Bb]in/
+[Oo]bj/
+
+# 编译中间文件
+*.ilk
+*.meta
+*.obj
+*.pch
+*.pdb
+*.pgd
+*.rsp
+*.sbr
+
+# =============== 日志与临时文件 ===============
+*.log
+*.tlog
+*.lastbuildstate
+*.vcxproj.filters.user
+*.ide/
+
+# =============== 操作系统文件 ===============
+Thumbs.db
+.DS_Store

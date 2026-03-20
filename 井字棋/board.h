@@ -5,14 +5,18 @@
 #include<random>
 #include<fstream>
 #include<vector>
+#include <graphics.h>
+#include <conio.h>
+#include <cstdlib>  
 using namespace std;
-
+ 
 extern int board[9];
 extern int playerColor;
 
 void initBoard();
 void drawBoard();
 void drawPiece(int pos, int Color);
-int checkWin();
+int playerMove();
 void closeBoard();
 vector<int> getAvailble();
+int checkWin();
