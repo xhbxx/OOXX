@@ -19,7 +19,6 @@ public:
 	int move();
 	//一般计算价值 
 	int minmax(int Color, int depth,int alpha,int beta);
-	int evaluate();
 	//转化棋盘  
 	int convertBoard(int Board[9]);
 	void revertBoard(int index,int board[9]);

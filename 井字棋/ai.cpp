@@ -23,12 +23,6 @@ int ai::minmax(int Color,int depth,int alpha,int beta)
 		return 0;
 	}
 	
-	// 深度限制
-	if (depth == 0)
-	{
-		return evaluate();
-	}
-	
 	int val = 0;
 	if (Color == aiColor)
 	{
@@ -71,46 +65,7 @@ int ai::minmax(int Color,int depth,int alpha,int beta)
 	}
 	return val;
 }
-//计算局面价值
-int ai::evaluate()
-{
-	const int win[8][3] = {
-		   {0,1,2},{3,4,5},{6,7,8},{0,3,6},{1,4,7},{2,5,8},{0,4,8},{2,4,6}
-	};
-	int val = 0;
-	for (int i = 0; i < 8; i++)
-	{	
-		if (board[win[i][0]] != 0 && board[win[i][0]] == board[win[i][1]] && board[win[i][1]] == board[win[i][2]])
-		{
-			if (board[win[i][1]] == this->aiColor)
-			{
-				val += 100;
-			}
-			else
-			{
-				val -= 100;
-			}
-		};
-		if (board[win[i][0]] == board[win[i][1]] || board[win[i][0]] == board[win[i][2]])
-		{
-			if (board[win[i][0]] == this->aiColor)
-			{
-				val += 10;
-			}
-			else { val -= 10; }
-		}
-		if (board[win[i][1]] == board[win[i][2]])
-		{
-			if (board[win[i][1]] == this->aiColor)
-			{
-				val += 10;
-			}
-			else { val -= 10; }
-		}
-		return val;
-		
-	}
-}
+
 //重置存储的棋盘
 void ai::reset()
 {
